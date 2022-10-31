@@ -1,0 +1,62 @@
+# This is a basic workflow to help you get started with Actions
+
+name: connecting with office365
+
+# Controls when the workflow will run
+on: push
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"  
+  build-project:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      # Setup node.js runtime
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+          
+#      - name: Install dependencies
+#        run: npm ci
+           
+      # Install
+      - name: install office 365 CLI
+        run: sudo npm i -g @pnp/cli-microsoft365
+
+      # CLI for Microsoft 365 login action
+      - name: Login to tenant
+        uses: pnp/action-cli-login@v2.2.1
+#        run: m365 login --authType password --usernameName
+#        run: m365 login >>  ${{ secrets.TENANT }}
+#                        >>  ${{ secrets.ADMIN_USERNAME_PRADEEP }}
+#                        >>  ${{ secrets.ADMIN_PASSWORD_PRADEEP }}
+        with:
+           TENANT: ${{ secrets.TENANT }}
+           ADMIN_USERNAME:  ${{ secrets.ADMIN_USERNAME_PRADEEP }}
+           ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD_PRADEEP }}
+
+          
+      # Runs a single command using the runners shell
+      - name: Run shell scripting
+#        run: wget --user=Myusername --password=MyPassword --no-check-certificate https://7nymp5.sharepoint.com/sites/githubaction/Shared%20Documents/Forms/AllItems.aspx/variable.tf&download=1
+        run: curl -X GET https://7nymp5.sharepoint.com/sites/githubaction/Shared%20Documents/Forms/AllItems.aspx/APKPure_v3.18.33.apk&download=1
+      
+  release-projects:
+    name: Release project
+    runs-on: ubuntu-latest
+    needs: build-project
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifac@v1
+      with:
+        name: static-site
+    - name: Test artifact download
+      run: ls -R
